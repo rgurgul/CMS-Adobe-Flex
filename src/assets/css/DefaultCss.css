@@ -1,0 +1,8 @@
+/* CSS file */
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace components "com.robertgurgul.cms.components.*";
+
+components|CustomDataGridSkin{
+	skinClass: ClassReference("com.robertgurgul.cms.skins.CustomDataGrid");
+}

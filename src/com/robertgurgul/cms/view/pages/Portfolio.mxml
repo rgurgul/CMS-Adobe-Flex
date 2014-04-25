@@ -1,0 +1,95 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:components="com.robertgurgul.cms.components.*"
+		 width="715" height="100%">
+	
+	<s:layout>
+		<s:BasicLayout/>
+	</s:layout>
+	
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.darronschall.serialization.ObjectTranslator;
+			import com.robertgurgul.cms.classes.FileUpload;
+			import com.robertgurgul.cms.message.gallery.AddGalleryImgMessage;
+			import com.robertgurgul.cms.message.gallery.GalleryMessage;
+			import com.robertgurgul.cms.vo.GalleryVo;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.events.FlexEvent;
+			import mx.utils.ArrayUtil;
+			
+			[Inject]
+			public var fileUpload:FileUpload;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			
+			[CommandResult(selector="GET_GALLERY_PORTFOLIO")]
+			public function getPhoto (result: Object, trigger:GalleryMessage) : void 
+			{
+				galleryGroup.dataProvider = null;
+				var obj:ArrayCollection = ArrayCollection(result);
+				galleryGroup.dataProvider = obj;
+			}
+			
+			[CommandResult(selector="ADD_GALLERY_PORTFOLIO")]
+			public function imgAdded (result: Object, trigger:AddGalleryImgMessage) : void 
+			{
+				var galleryVo:GalleryVo = new GalleryVo();
+				galleryVo.table = GalleryMessage.TABLE_PORTFOLIO;
+				dispatcher( new GalleryMessage(GalleryMessage.GET_GALLERY_PORTFOLIO, galleryVo) );
+			}
+			
+			[CommandResult(selector="REMOVE_IMG")]
+			public function imgRemoved (result: Object, trigger:GalleryMessage) : void 
+			{
+				var galleryVo:GalleryVo = new GalleryVo();
+				galleryVo.table = GalleryMessage.TABLE_PORTFOLIO;
+				dispatcher( new GalleryMessage(GalleryMessage.GET_GALLERY_PORTFOLIO, galleryVo) );
+			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				fileUpload.fileUpload(GalleryMessage.LINK_PORTFOLIO);
+				fileUpload.addEventListener("uploadDataComplete", refreshGallery);
+			}
+			
+			protected function refreshGallery(event:Event):void
+			{
+				Alert.show(fileUpload.loadedImg, 'dispatch');
+				dispatcher( new AddGalleryImgMessage(AddGalleryImgMessage.ADD_GALLERY_PORTFOLIO, 
+					AddGalleryImgMessage.TABLE_PORTFOLIO, 
+					fileUpload.loadedImg,
+					GalleryMessage.LINK_PORTFOLIO) );
+			}
+			
+			public function removeImg(obj:Object):void
+			{
+				var objToRemove:GalleryVo = GalleryVo(ObjectTranslator.objectToInstance( obj, GalleryVo ));
+				objToRemove.table = GalleryMessage.TABLE_PORTFOLIO;
+				dispatcher( new GalleryMessage(GalleryMessage.REMOVE_IMG, objToRemove) );
+			}
+			
+		]]>
+	</fx:Script>
+	<s:Button y="4" label="Dodaj zdjęcie do portfolio" click="button1_clickHandler(event)"/>
+	
+	<s:Scroller y="30" width="100%" height="100%">
+		<components:CustomDataGroup id="galleryGroup" automationName="portfolio"
+									itemRenderer="com.robertgurgul.cms.view.renderers.GalleryRenderer">
+			<components:layout>
+				<s:TileLayout columnWidth="100" horizontalGap="20" verticalGap="20"/>
+			</components:layout>
+		</components:CustomDataGroup>
+	</s:Scroller>
+	
+</s:Group>

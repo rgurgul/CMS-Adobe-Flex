@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:SparkSkin xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		xmlns:s="library://ns.adobe.com/flex/spark" 
+		xmlns:mx="library://ns.adobe.com/flex/mx">
+	<!-- host component -->
+	<fx:Metadata>
+		[HostComponent("pl.gov.men.sio2.szkolenie.komponenty.przyklad4.Alert")]
+	</fx:Metadata>
+	
+	<!-- states -->
+	<s:states>
+		<s:State name="primary" />
+		<s:State name="primaryWithSecondary" />
+	</s:states>
+	
+	<s:Panel title="Alert"
+			 width="350" height="180">
+		<s:TextBase id="messageDisplay"
+					x="30" y="10" width="280" height="100"/>
+		<s:Button id="primaryButton"
+				  x="140" bottom="10"
+				  label="OK"/>
+	</s:Panel>
+	
+</s:SparkSkin>

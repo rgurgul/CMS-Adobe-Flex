@@ -1,0 +1,71 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				width="80" height="80" autoDrawBackground="false" clipAndEnableScrolling="false"
+				depth="0"
+				depth.hovered="1">
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			
+			import mx.controls.Alert;
+			import mx.core.IUIComponent;
+			import mx.events.CloseEvent;
+			import mx.managers.DragManager;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+
+			public var selectImg:String = 'nic';
+			public var selectedIndex:int;
+			public var idImgToRemove:int;
+			
+			protected function group_clickHandler(event:MouseEvent):void
+			{
+				selectImg = data.imgSrc;
+				selectedIndex = itemIndex;
+				dispatchEvent( new Event('setImageURL', true) );
+			}
+			
+			//drag and drop functions
+			private function mouseDownHandler(e:MouseEvent):void 
+			{
+				trace(data.dir);
+				selectImg = data.imgSrc;
+				selectedIndex = itemIndex;
+				dispatchEvent( new Event('setImageURL', true) );
+				DragManager.doDrag(e.currentTarget as IUIComponent, null, e);
+			}
+			public function removeImg(event:MouseEvent):void
+			{
+				Alert.show("czy chcesz usunąć ten zdjęcie?", "Potwierdź",Alert.OK | Alert.CANCEL, null, function(eventObj:CloseEvent):void
+				{
+					if(eventObj.detail==Alert.OK)
+					{
+						parentDocument.removeImg(data);
+					}
+				});
+			}
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="normal"/>
+		<s:State name="hovered"/>
+	</s:states>
+	
+	<!--click="group_clickHandler(event)"-->
+	<s:Image id="image" horizontalCenter="0" mouseDown="mouseDownHandler(event)" scaleX="1"
+			 scaleY="1" smooth="true" source="{data.dir + data.imgSrc}" verticalCenter="0"
+			 width.hovered="50" height.hovered="50"
+			 width.normal="50" height.normal="50"/>
+	
+	<s:RichText top="70" width="120" color="black" fontSize="8" horizontalCenter="0"
+				styleName="embeddedFont" textAlign="center"
+				textFlow="{ Utils.convertText(data.imgSrc) }"/>
+	
+	<s:RichText top="0" width="120" click="removeImg(event)" color="red" fontSize="10"
+				horizontalCenter="0" styleName="embeddedFont" text="usuń" textAlign="center"/>
+
+</s:ItemRenderer>

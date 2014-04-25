@@ -1,0 +1,52 @@
+/* CSS file */
+
+@namespace s "library://ns.adobe.com/flex/spark";
+@namespace mx "library://ns.adobe.com/flex/mx";
+@namespace view "com.robertgurgul.cms.view.*";
+@namespace windows "com.robertgurgul.cms.view.windows.*";
+
+
+@font-face {
+	src: url('assets/fonts/Ubuntu-Regular.ttf');
+	font-family: Ubuntu;
+/*	embed-as-cff: true;*/
+}
+
+global {
+	font-family: Tahoma;
+	font-size: 12px;
+}
+s|RichEditableText
+{
+	font-family: Ubuntu;
+}
+
+s|TextInput
+{
+	font-family: Ubuntu;
+}
+
+mx|Alert
+{
+	messageStyleName: alertStyle;
+}
+s|Button
+{
+	cornerRadius: 0;
+}
+mx|Button
+{
+	cornerRadius: 0;
+}
+.alertStyle 
+{
+	font-weight: bold;
+}
+mx|ToolTip 
+{
+	fontFamily: "Arial";
+	fontSize: 12;
+	color: #000000;
+	cornerRadius: 0;
+	backgroundColor: #FCE583;
+}

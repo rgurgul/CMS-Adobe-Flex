@@ -1,0 +1,132 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:components="com.robertgurgul.cms.components.*"
+		 width="715" height="100%" >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.darronschall.serialization.ObjectTranslator;
+			import com.robertgurgul.cms.message.gallery.GalleryMessage;
+			import com.robertgurgul.cms.message.pages.HomeImgMessage;
+			import com.robertgurgul.cms.utils.PopUp;
+			import com.robertgurgul.cms.view.windows.GalleryBox;
+			import com.robertgurgul.cms.view.windows.forms.HomeImgForm;
+			import com.robertgurgul.cms.vo.HomeImgVo;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import org.spicefactory.parsley.core.context.Context;
+			
+			import spark.components.TitleWindow;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			[Inject]
+			public var context:Context;
+			private var addHomeImg:HomeImgForm;
+			
+			public function deleteProduct(img:Object):void
+			{
+				var objToRemove:HomeImgVo = ObjectTranslator.objectToInstance( img, HomeImgVo ) as HomeImgVo;
+				dispatcher( new HomeImgMessage(HomeImgMessage.REMOVE_IMG, objToRemove) );
+			}
+			
+			public function showItemWin(kind:String):void
+			{
+				addHomeImg = new HomeImgForm();
+				addHomeImg.kind = kind;
+				addHomeImg.item = kind == 'EDIT' ? dg.selectedItem : null ;
+				context.viewManager.addViewRoot(addHomeImg);
+				popUp.showWindow( addHomeImg );
+				addHomeImg.addEventListener('showGalleryWin', showGalleryWin);
+			}
+			
+			protected function showGalleryWin(event:Event):void
+			{
+				var galleryBox:GalleryBox = new GalleryBox();
+				galleryBox.link = GalleryMessage.LINK_HOME_IMG_FOLDER;
+				context.viewManager.addViewRoot( galleryBox );
+				PopUpManager.addPopUp(galleryBox, FlexGlobals.topLevelApplication.panelCMS, true);
+				PopUpManager.centerPopUp(galleryBox as TitleWindow); 
+				galleryBox.addEventListener('setImageURL', setImageURL);
+			}
+
+			protected function setImageURL(e:Event):void
+			{
+				addHomeImg.img.source = GalleryMessage.LINK_HOME_IMG_FOLDER + e.target.selectImg;
+			}
+			
+			[CommandResult(selector="GET_IMG")]
+			public function newsResult (result: Object, trigger:HomeImgMessage) : void 
+			{
+				dg.dataProvider = null;
+				var obj:ArrayCollection = result as ArrayCollection;
+				for( var i:int = 0; i < obj.length; i++)
+				{
+					switch(obj[i].place)
+					{
+						case "0":
+							obj[i].placeTxt = "left";
+							break;
+						case "1":
+							obj[i].placeTxt = "right-top";
+							break;
+						case "2":
+							obj[i].placeTxt = "right-bottom";
+							break;
+					}
+				} 
+				dg.dataProvider = obj;
+			}
+			
+			[CommandResult(selector="REMOVE_IMG")]
+			public function removePostResult (result: Object, trigger:HomeImgMessage) : void 
+			{
+				Alert.show('usunięto z serwera', String(result));
+				dispatcher( new HomeImgMessage(HomeImgMessage.GET_IMGS ) );
+			}
+			
+			[CommandResult(selector="ADD_IMG")]
+			public function addedPostResult (result: Object, trigger:HomeImgMessage) : void 
+			{
+				Alert.show('dodano nowe zdjęcie');
+				dispatcher( new HomeImgMessage(HomeImgMessage.GET_IMGS ) );
+			}
+			
+			[CommandResult(selector="EDIT_IMG")]
+			public function editedPostResult (result: Object, trigger:HomeImgMessage) : void 
+			{
+				Alert.show('zaktualizowano produkt');
+				dispatcher( new HomeImgMessage(HomeImgMessage.GET_IMGS ) );
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Button label="Dodaj nowy zdjęcie" click="showItemWin('ADD')" cornerRadius="0"/>
+	
+	<components:CustomDataGrid y="25" width="100%" id="dg" automationName="home_img" 
+							   height="100%" requestedRowCount="4" lineHeight="100">
+		<components:columns>
+			<s:ArrayList>
+				<s:GridColumn dataField="dataField0" headerText="Zdjęcie" itemRenderer="com.robertgurgul.cms.view.renderers.CustomDG.IconPhoto"></s:GridColumn>
+				<s:GridColumn dataField="placeTxt" headerText="Pozycja"></s:GridColumn>
+				<s:GridColumn dataField="dataField2" headerText="Edycja" itemRenderer="com.robertgurgul.cms.view.renderers.CustomDG.IconEdit" width="55"></s:GridColumn>
+				<s:GridColumn dataField="dataField3" headerText="Usuń" itemRenderer="com.robertgurgul.cms.view.renderers.CustomDG.IconRemove" width="45"></s:GridColumn>
+			</s:ArrayList>
+		</components:columns>
+	</components:CustomDataGrid>
+	
+</s:Group>

@@ -1,0 +1,203 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:parsley="http://www.spicefactory.org/parsley"
+		 width="210" height="100%" creationComplete="init(event)">
+	
+	<fx:Declarations>
+		<parsley:Configure/>	
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.message.gallery.GalleryMessage;
+			import com.robertgurgul.cms.message.pages.HomeImgMessage;
+			import com.robertgurgul.cms.message.pages.MemberMessage;
+			import com.robertgurgul.cms.message.pages.NewsMessage;
+			import com.robertgurgul.cms.message.pages.PageMessage;
+			import com.robertgurgul.cms.message.pages.ProductsMessage;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.remoting.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			import com.robertgurgul.cms.vo.GalleryVo;
+			import com.robertgurgul.cms.vo.PageVo;
+			import com.robertgurgul.cms.vo.ProductVo;
+			
+			import mx.events.FlexEvent;
+			import mx.events.ListEvent;
+
+			[Bindable]
+			[Embed("assets/bullet_text.png")]
+			private var myBulletTextIcon:Class;
+			
+			[Bindable]
+			[Embed("assets/bullet_posts.png")]
+			private var myBulletPostsIcon:Class;
+			
+			[Bindable]
+			[Embed("assets/bullet_list.png")]
+			private var myBulletListIcon:Class;
+			
+			[Bindable]
+			[Embed("assets/bullet_hide.png")]
+			private var myBulletHideIcon:Class;
+			
+			
+			
+			[Bindable]
+			[Embed("assets/btn_add_big.png")]
+			private var myBulletAddIcon:Class;
+
+			[Bindable]
+			[Embed("assets/btn_add_sub_menu_big.png")]
+			private var myBulletAddSubMenuIcon:Class;
+
+			[Bindable]
+			[Embed("assets/btn_add_sub_sub_menu_big.png")]
+			private var myBulletAddSub2MenuIcon:Class;
+			
+			[Bindable]
+			[Embed("assets/btn_link.png")]
+			private var myBulletLinkIcon:Class;
+			
+			[Bindable]
+			[Embed("assets/btn_remove_big.png")]
+			private var myBulletRemoveIcon:Class;
+			
+			[Bindable]
+			[Embed("assets/btn_show_hide_big.png")]
+			private var myBulletShowHideIcon:Class;
+			
+			[Bindable]
+			[Embed("assets/btn_image.png")]
+			private var myBulletImgIcon:Class;
+			
+			import mx.collections.ArrayCollection;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			[Inject]
+			public var popUp:PopUp;
+
+			
+			public function init(e:Event = null):void
+			{
+				DataHolder.getInstance().addEventListener("refreshMenu", refreshMenu);
+			}
+			
+			private function tree_iconFunc(item:Object):Class 
+			{
+				
+				var iconClass:Class;
+				
+				
+				switch(item.kindCMS)
+				{
+					case 'text':
+						iconClass = myBulletTextIcon;
+						break;
+					case 'post':
+						iconClass = myBulletPostsIcon;
+						break;
+					case 'news':
+						iconClass = myBulletListIcon;
+						break;
+					case 'portfolio':
+						iconClass = myBulletImgIcon;
+						break;
+					case 'edukacja':
+						iconClass = myBulletImgIcon;
+						break;
+				}
+				
+				if(int(item.show_stat) == 0) iconClass = myBulletHideIcon;
+				
+				return iconClass;
+			}
+			
+			// Event handler for the Tree control change event.
+			public function treeChanged(event:Event):void {
+				
+			}
+			
+			protected function menuTree_changeHandler(event:ListEvent):void
+			{
+				Controller.getInstance().lastClick = 'menu';
+				
+				Utils.youAreIn = 'Edytyjesz stronę: ' + menuTree.selectedItem.name;
+				
+				switch(menuTree.selectedItem.kindCMS)
+				{
+					case "text":
+						var pageVo:PageVo = new PageVo();
+						pageVo.id = menuTree.selectedItem.id;
+						
+						dispatcher( new PageMessage(PageMessage.GET_PAGE, pageVo) );
+						DataHolder.getInstance().currentPage = menuTree.selectedItem as Object;
+						Utils.changeViewStack = 0;
+						break;
+					case "post":
+						var productVo:ProductVo = new ProductVo();
+						productVo.id = menuTree.selectedItem.id
+						
+						dispatcher( new ProductsMessage(ProductsMessage.GET_PRODUCTS, productVo ) );
+						DataHolder.getInstance().currentPage = menuTree.selectedItem as Object;
+						Utils.changeViewStack = 1;
+						break;
+					case "news":
+						dispatcher( new NewsMessage(NewsMessage.GET_NEWS ) );
+						DataHolder.getInstance().currentPage = menuTree.selectedItem as Object;
+						Utils.changeViewStack = 2;
+						break;
+					case "portfolio":
+						var galleryVoPortfolio:GalleryVo = new GalleryVo();
+						galleryVoPortfolio.table = GalleryMessage.TABLE_PORTFOLIO;
+						dispatcher( new GalleryMessage(GalleryMessage.GET_GALLERY_PORTFOLIO, galleryVoPortfolio) );
+						DataHolder.getInstance().currentPage = menuTree.selectedItem as Object;
+						Utils.changeViewStack = 3;
+						break;
+					case "edukacja":
+						var galleryVo:GalleryVo = new GalleryVo();
+						galleryVo.table = GalleryMessage.TABLE_EDUKACJA;
+						dispatcher( new GalleryMessage(GalleryMessage.GET_GALLERY_EDUKACJA, galleryVo) );
+						DataHolder.getInstance().currentPage = menuTree.selectedItem as Object;
+						Utils.changeViewStack = 4;
+						break;
+					case "home-img":
+						dispatcher( new HomeImgMessage(HomeImgMessage.GET_IMGS) );
+						DataHolder.getInstance().currentPage = menuTree.selectedItem as Object;
+						Utils.changeViewStack = 5;
+						break;
+					case "zespol":
+						dispatcher( new MemberMessage( MemberMessage.GET_MEMBERS ) );
+						DataHolder.getInstance().currentPage = menuTree.selectedItem as Object;
+						Utils.changeViewStack = 6;
+						break;
+				}
+			}
+			
+			protected function menuTree_creationCompleteHandler(event:FlexEvent):void
+			{
+
+			}
+			
+			protected function refreshMenu(event:Event):void
+			{
+				menuTree.openItems = menuTree.dataProvider;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<mx:Tree id="menuTree" x="5" y="5" bottom="30" width="200" height="100%" borderColor="0xffffff"
+			 change="menuTree_changeHandler(event)" color="0x000000"
+			 contentBackgroundColor="0xF0FCFF"
+			 creationComplete="menuTree_creationCompleteHandler(event)"
+			 dataProvider="{ DataHolder.getInstance().dataMenu }" iconFunction="tree_iconFunc"
+			 labelField="name"/>
+	<mx:Canvas x="5" bottom="0">
+	</mx:Canvas>
+</s:Group>

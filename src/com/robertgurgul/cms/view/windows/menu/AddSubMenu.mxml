@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   width="362" height="210" close="Utils.closeHandler2()"
+			   title="Dodanie nowego przycisku w menu">
+
+	<fx:Script>	
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.remoting.*;
+
+		]]>
+	</fx:Script>
+	
+	<s:DropDownList id="menuID" x="202" y="14" width="147" cornerRadius="0"
+					dataProvider="{ DataHolder.getInstance().dataMenu }" labelField="name"/>
+	<s:TextInput id="sub" x="202" y="62" width="147"/>
+	
+	<s:DropDownList id="kindCMS" x="203" y="108" width="147" cornerRadius="0" labelField="name">
+		<s:dataProvider>
+			<mx:ArrayList>
+				<fx:String>text</fx:String>
+				<fx:String>post</fx:String>
+				<fx:String>lista</fx:String>
+			</mx:ArrayList>
+		</s:dataProvider>
+	</s:DropDownList>
+	<s:Label x="10" y="12" text="Wybierz zakładkę do ktorej &#xd;chcesz dodac &quot;pod menu&quot;."/>
+	<s:Label x="9" y="67" text="Nazwa nowej zakładki:"/>
+	<s:Label x="10" y="112" text="Typ strony:"/>
+	<mx:HRule x="10" y="49" width="340" height="1"/>
+	<mx:HRule x="10" y="96" width="340" height="1"/>
+	
+	<s:controlBarContent>
+		<s:HGroup verticalAlign="baseline">
+			<s:Button x="10" y="153" label="Wyślij"
+					  click="{ ServiceConnector.getInstance().addSubMenu(menuID, sub.text, kindCMS) }"
+					  cornerRadius="0"/>		
+		</s:HGroup>
+	</s:controlBarContent>
+	
+</s:TitleWindow>

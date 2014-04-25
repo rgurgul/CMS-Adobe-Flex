@@ -1,0 +1,43 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" width="716" >
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			
+			import flashx.textLayout.formats.Float;
+			import flashx.textLayout.formats.TextAlign;
+			
+			import mx.controls.Alert;
+			
+			public var control:Tlf_control;
+			
+			
+		]]>
+	</fx:Script>
+	<mx:Label x="8" y="2" fontWeight="bold" text="URL:"/>
+	<mx:TextInput id="imageURL" x="40" y="0" width="198" text="" textAlign="right"/>
+	<mx:Label x="243" y="2" fontWeight="bold" text="Szer:"/>
+	<mx:TextInput x="277" y="0" width="36" id="imageWidth" text="auto" />
+	<mx:Label x="320" y="2" fontWeight="bold" text="Wys:"/>
+	<mx:TextInput x="353" y="0" id="imageHeight" width="36" text="auto" />
+	<mx:Label x="397" y="2" fontWeight="bold" text="Przyciąganie:"/>
+	<s:ButtonBar id="floatChoose" selectedIndex="0" x="480" y="0" width="90" arrowKeysWrapFocus="true" labelField="label" >
+		<s:layout>
+			<s:ButtonBarHorizontalLayout/>
+		</s:layout>
+		<s:dataProvider>
+			<s:ArrayList>
+				<fx:Object label="L" value="{Float.LEFT}"/>
+				<fx:Object label="N" value="{Float.NONE}" />
+				<fx:Object label="R" value="{Float.RIGHT}" />
+			</s:ArrayList>
+		</s:dataProvider>
+	</s:ButtonBar>
+	<mx:Button id="imageButton" x="578" y="0" label="wstaw" click="control.imageBtn_clickHandler(event)" cornerRadius="0"/>
+	<s:Button x="656" y="0" width="49" label="baza" click="{ dispatchEvent( new Event('showGalleryWin', true) ) }" cornerRadius="0"/>
+</s:Group>

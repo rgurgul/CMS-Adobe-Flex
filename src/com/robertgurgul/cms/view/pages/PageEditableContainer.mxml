@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:view="com.robertgurgul.cms.view.*">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.model.*;
+			import spark.utils.TextFlowUtil;
+		]]>
+	</fx:Script>
+	
+	<s:RichEditableText id="editor" y="25" width="715" height="100%" backgroundColor="0xF7F7F7"
+						lineBreak="toFit">
+	</s:RichEditableText>
+	<mx:TextInput id="titlee" x="0" y="0" width="715" height="20" borderVisible="true"
+				  paddingLeft="2" text="{ DataHolder.getInstance().dataPage.title }"/>
+
+</s:Group>

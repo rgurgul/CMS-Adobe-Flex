@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009" 
+			   xmlns:s="library://ns.adobe.com/flex/spark" 
+			   xmlns:mx="library://ns.adobe.com/flex/mx" 
+			   width="622" height="470"
+			   title="{'Lista zdjęć w katalogu: ' + link}" 
+				xmlns:parsley="http://www.spicefactory.org/parsley" 
+				close="closeHandler(event)" 
+				xmlns:components="com.robertgurgul.cms.components.*" 
+				creationComplete="init(event)">
+	
+	<fx:Declarations>
+		<parsley:Configure />
+	</fx:Declarations>
+	
+	<fx:Script>
+		
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.message.gallery.GalleryMessage;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.remoting.*;
+			import com.robertgurgul.cms.vo.GalleryVo;
+			
+			import mx.collections.ArrayCollection;
+			import mx.events.CloseEvent;
+			import mx.events.FlexEvent;
+			import mx.managers.PopUpManager;
+			import mx.utils.ArrayUtil;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+
+			[Inject]
+			public var fileUpload:FileUpload;
+			
+			[Bindable] public var link:String;
+
+			protected function init(event:FlexEvent):void
+			{
+				var galleryVo:GalleryVo = new GalleryVo();
+				galleryVo.link = link;
+				dispatcher( new GalleryMessage(GalleryMessage.GET_GALLERY_PRODUCTS, galleryVo ) );
+			}
+			
+			public function closeHandler(event:CloseEvent = null):void
+			{
+				PopUpManager.removePopUp(this as TitleWindow);
+			}
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				fileUpload.fileUpload(link);
+				fileUpload.addEventListener("uploadDataComplete", refreshGallery);
+			}
+			
+			protected function refreshGallery(event:Event):void
+			{
+				var galleryVo:GalleryVo = new GalleryVo();
+				galleryVo.link = link;
+				dispatcher( new GalleryMessage(GalleryMessage.GET_GALLERY_PRODUCTS, galleryVo ) );
+			}
+			
+			[CommandResult(selector="GET_GALLERY_PRODUCTS")]
+			public function getPhoto (result: Object, trigger:GalleryMessage) : void 
+			{
+				galleryGroup.dataProvider = null;
+				var obj:ArrayCollection = new ArrayCollection(ArrayUtil.toArray(result[0]));
+				galleryGroup.dataProvider = obj;
+			}
+	
+		]]>
+	</fx:Script>
+	
+	<s:Scroller>
+		<s:DataGroup id="galleryGroup" width="605" height="400"
+									itemRenderer="com.robertgurgul.cms.view.renderers.DgRenderer">
+			<s:layout>
+				<s:TileLayout horizontalGap="20" verticalGap="20" columnWidth="100"/>
+			</s:layout>
+		</s:DataGroup>
+	</s:Scroller>
+	
+	<s:controlBarContent>
+		<s:HGroup verticalAlign="baseline">
+			<mx:Button y="4" label="Dodaj zdjęcie na serwer" click="button1_clickHandler(event)" cornerRadius="0"/>
+		</s:HGroup>
+	</s:controlBarContent>
+</s:TitleWindow>

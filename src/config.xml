@@ -1,0 +1,8 @@
+﻿<?xml version="1.0" encoding="utf-8" ?>
+<items>
+	<item id="menu" val="true" />
+	<item id="sub1" val="true" />
+	<item id="sub2" val="true" />
+	<item id="pathURL" val="http://cms2.mkombinat.pl/index/" />
+</items>
+

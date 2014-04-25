@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:parsley="http://www.spicefactory.org/parsley"
+		 creationComplete="init()" >
+	
+	<fx:Declarations>
+		<parsley:Configure />
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import mx.controls.Alert;
+			
+			public var kind:String;
+			public var selection:String;
+			
+			private function init():void
+			{
+				if(kind == 'ADD')
+				{
+					currentState="add"
+				} else
+				{
+					currentState="edit"
+				}
+			}
+			
+			public function clickHandler(event:MouseEvent):void
+			{
+				Alert.show(kind + "_GO");
+				selection = kind + "_GO";
+				dispatchEvent( new Event("btnClicked", true) );
+			}
+			
+		]]>
+	</fx:Script>
+	<s:states>
+		<s:State name="add"/>
+		<s:State name="edit"/>
+	</s:states>
+	
+	<s:Button label="Wyślij"
+			  label.edit="Zaktualizuj"
+			  label.add="Dodaj" click="clickHandler(event)"/>
+</s:Group>

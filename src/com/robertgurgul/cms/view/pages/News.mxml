@@ -1,0 +1,116 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:view="com.robertgurgul.cms.view.*"
+		 width="715" height="100%" 
+		 creationComplete="init();"
+		 xmlns:parsley="http://www.spicefactory.org/parsley" 
+		 xmlns:skins="com.robertgurgul.cms.skins.*"
+		 xmlns:components="com.robertgurgul.cms.components.*">
+	
+	<fx:Declarations>
+		<!--<parsley:Configure />-->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.darronschall.serialization.ObjectTranslator;
+			import com.robertgurgul.cms.message.pages.NewsMessage;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			import com.robertgurgul.cms.view.windows.GalleryBox;
+			import com.robertgurgul.cms.view.windows.forms.NewsForm;
+			import com.robertgurgul.cms.vo.NewsVo;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			
+			import org.spicefactory.parsley.core.context.Context;
+			
+			private var newsWin:NewsForm;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			[Inject]
+			public var context:Context;
+			
+			[Inject][Bindable]
+			public var dataHolder:DataHolder2;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			private var galleryBox:GalleryBox;
+
+			private function init():void
+			{
+				
+			}
+
+			public function deleteProduct(news:Object):void
+			{
+				var objToRemove:NewsVo = ObjectTranslator.objectToInstance( news, NewsVo ) as NewsVo;
+				dispatcher( new NewsMessage( NewsMessage.REMOVE_NEWS, objToRemove ) );
+			}
+			
+			public function showItemWin(kind:String):void
+			{
+				newsWin = new NewsForm();
+				newsWin.kind = kind;
+				newsWin.newsToUpdate = kind == 'EDIT' ? dg.selectedItem : null ;
+				context.viewManager.addViewRoot(newsWin);
+				popUp.showWindow( newsWin );
+			}
+			
+			[CommandResult(selector="GET_NEWS")]
+			public function newsResult (result: Object, trigger:NewsMessage) : void 
+			{
+				dg.dataProvider = null;
+				var obj:ArrayCollection = result as ArrayCollection;
+				for( var i:int = 0; i < obj.length; i++)
+				{
+					obj[i].kindTxt = obj[i].kind == 0 ? "promocja" : "news";
+				}
+				dg.dataProvider = obj;
+			}
+			
+			[CommandResult(selector="REMOVE_NEWS")]
+			public function removeNewsResult (result: Object, trigger:NewsMessage) : void 
+			{
+				Alert.show('usunięto z serwera');
+				dispatcher( new NewsMessage(NewsMessage.GET_NEWS ) );
+			}
+			
+			[CommandResult(selector="ADD_NEWS")]
+			public function addedNewsResult (result: Object, trigger:NewsMessage) : void 
+			{
+				Alert.show('dodano nowy produkt');
+				dispatcher( new NewsMessage(NewsMessage.GET_NEWS ) );
+			}
+			
+			[CommandResult(selector="UPDATE_NEWS")]
+			public function editedNewsResult (result: Object, trigger:NewsMessage) : void 
+			{
+				Alert.show('zaktualizowano produkt', String(result));
+				dispatcher( new NewsMessage(NewsMessage.GET_NEWS ) );
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Button label="Dodaj nowy news" click="showItemWin('ADD')" cornerRadius="0"/>
+	
+	<components:CustomDataGrid y="25" width="100%" id="dg" height="100%" automationName="news" requestedRowCount="4">
+		<components:columns>
+			<s:ArrayList>
+				<s:GridColumn dataField="textTlf" headerText="Tytuł"></s:GridColumn>
+				<s:GridColumn dataField="kindTxt" headerText="Rodzaj"></s:GridColumn>
+				<s:GridColumn dataField="dataField2" headerText="Edycja" itemRenderer="com.robertgurgul.cms.view.renderers.CustomDG.IconEdit" width="55"></s:GridColumn>
+				<s:GridColumn dataField="dataField3" headerText="Usuń" itemRenderer="com.robertgurgul.cms.view.renderers.CustomDG.IconRemove" width="45"></s:GridColumn>
+			</s:ArrayList>
+		</components:columns>
+	</components:CustomDataGrid>
+
+</s:Group>

@@ -1,0 +1,67 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:parsley="http://www.spicefactory.org/parsley">
+	
+	<fx:Declarations>
+		<parsley:Configure />
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			import com.robertgurgul.cms.view.windows.PdfList;
+			
+			import flashx.textLayout.formats.Float;
+			import flashx.textLayout.formats.TextAlign;
+			
+			import mx.controls.Alert;
+			
+			import spark.events.IndexChangeEvent;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			public var control:Tlf_control;
+			
+			[Bindable] private var arr:Array = new Array("_blank","_self");
+			
+			public function setTargetCombo(val:String):void
+			{
+				var length:uint = linkTargetCombo.dataProvider.length;
+				
+				for (var i:uint = 0; i < length; i++)
+				{
+					if (linkTargetCombo.dataProvider.getItemAt(i).toLowerCase() == val.toLowerCase())
+					{
+						linkTargetCombo.selectedIndex = i;
+						return;
+					}
+				}
+				linkTargetCombo.selectedIndex = -1;
+				linkTargetCombo.validateNow();
+				linkTargetCombo.text = val;
+			}
+		]]>
+	</fx:Script>
+	<mx:ControlBar width="700" cornerRadius="0" paddingTop="0">
+		<mx:ToolBar width="700" horizontalGap="5" cornerRadius="0">
+			
+			<mx:Label y="0" fontWeight="bold" text="Link Url:"/>
+			<mx:TextInput id="linkTextInput" y="0" width="222" text="{ DataHolder.getInstance().linkuj }"/>
+			<mx:Label y="0" fontWeight="bold" text="Link Target:"/>
+			<mx:ComboBox id="linkTargetCombo" y="0" height="21" width="71" dataProvider="{ arr }" editable="true"
+						 selectedIndex="0" cornerRadius="0"/>
+			<mx:Button x="552" y="4" label="Dodaj pdf" click="FileUpload.getInstance().fileUpload('/assets/imgs/uploads/')" cornerRadius="0"/>
+			<mx:Button y="0" label="lisa pdf" cornerRadius="0" click="{ popUp.showWindow( new PdfList() ) }"/>
+			<mx:Button y="0" label="Zastosuj" cornerRadius="0"
+					   click="control.changeLink(linkTextInput.text, linkTargetCombo.text, linkExtendCheckBox.selected);"/>
+			
+			<mx:CheckBox id="linkExtendCheckBox" y="0" label="Extend" visible="false"/>
+			
+		</mx:ToolBar>
+	</mx:ControlBar>
+</s:Group>

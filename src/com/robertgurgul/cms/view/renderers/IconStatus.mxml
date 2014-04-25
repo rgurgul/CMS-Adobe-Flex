@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+					xmlns:s="library://ns.adobe.com/flex/spark"
+					xmlns:mx="library://ns.adobe.com/flex/mx"
+					click="griditemrenderer1_clickHandler(event)" creationComplete="init()">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.remoting.ServiceConnector;
+			
+			[Bindable]
+			[Embed("assets/btn_show.png")]
+			private var btn_show:Class;
+			
+			[Bindable]
+			[Embed("assets/bullet_hide.png")]
+			private var btn_hide:Class;
+			
+			public function init():void 
+			{
+
+			}
+			
+			protected function griditemrenderer1_clickHandler(event:MouseEvent):void
+			{
+				ServiceConnector.getInstance().suspendPost(data.id);
+				ServiceConnector.getInstance().getPosts(data.id_page);
+			}
+			
+		]]>
+	</fx:Script>
+
+	<s:BitmapImage id="image" horizontalCenter="0" source="{data.show_stat ? btn_show : btn_hide}"
+				   verticalCenter="0"/>
+	
+</s:GridItemRenderer>

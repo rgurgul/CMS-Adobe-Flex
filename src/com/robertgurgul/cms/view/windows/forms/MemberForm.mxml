@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:components="com.robertgurgul.cms.components.*"
+			   xmlns:parsley="http://www.spicefactory.org/parsley"
+			   width="446" height="492" close="popUp.closeHandler()" creationComplete="init()"
+			   title="Dodanie/Aktualizacja: pracownika">
+	
+	<fx:Declarations>
+		<parsley:Configure/>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.message.pages.MemberMessage;
+			import com.robertgurgul.cms.utils.PopUp;
+			import com.robertgurgul.cms.utils.Validator;
+			import com.robertgurgul.cms.vo.MemberVo;
+			
+			import mx.controls.Alert;
+			
+			[Inject]
+			public var popUp:PopUp;
+			public var memberToUpdate:Object;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			[Bindable] public var kind:String;
+			
+			private function init():void
+			{
+				if(memberToUpdate)
+				{
+					imie.text = memberToUpdate.name; 
+					position.text = memberToUpdate.position; 
+					cut_woman.text = memberToUpdate.cut_woman;
+					cut_man.text = memberToUpdate.cut_man;
+					cut_kids.text = memberToUpdate.cut_kids;
+					model.text = memberToUpdate.model;
+					color.text = memberToUpdate.color;
+					quotation.text = memberToUpdate.quotation;
+					description.text = memberToUpdate.description;
+					img.source = memberToUpdate.img;
+				}
+				
+				buttonAddEdit.addEventListener("btnClicked", btnClicked);
+			}
+			
+			protected function btnClicked(event:Event):void
+			{
+				switch(event.currentTarget.selection)
+				{
+					case "ADD_GO":
+						addMember();
+						break;
+					case "EDIT_GO":
+						editMember();
+						break;
+				}
+			}
+			
+			private function createMemberVo():MemberVo
+			{
+				var member:MemberVo = new MemberVo();
+				member.id = memberToUpdate ? memberToUpdate.id : NaN;
+				member.name = imie.text; 
+				member.position = position.text; 
+				member.cut_woman = cut_woman.text;
+				member.cut_man = cut_man.text;
+				member.cut_kids = cut_kids.text;
+				member.model = model.text;
+				member.color = color.text;
+				member.quotation = quotation.text;
+				member.description = description.text;
+				member.img = String(img.source);
+				return member;
+			}
+			
+			public function addMember():void
+			{
+				if(validatorion())
+				{
+					dispatcher( new MemberMessage( MemberMessage.ADD_MEMBER, createMemberVo() ) );
+					popUp.closeHandler();
+				} else {
+					Alert.show("Proszę uzupełnić formularz");
+				}
+			}
+			
+			public function editMember():void
+			{
+				if(validatorion())
+				{
+					dispatcher( new MemberMessage( MemberMessage.UPDATE_MEMBER, createMemberVo() ) );
+					popUp.closeHandler();	
+				} else {
+					Alert.show("Proszę uzupełnić formularz");
+				}
+			} 
+			
+			private function validatorion():Boolean
+			{
+				var result:Boolean = Validator.valid(
+					imie.text, 
+					position.text, 
+					quotation.text,
+					description.text
+				);
+				return result;
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Label x="304" y="153" text="imię:"/>
+	<s:Label x="10" y="58" text="cytat:"/>
+	<s:Label x="10" y="245" text="opis:"/>
+	<s:Label x="304" y="195" text="stanowisko:"/>
+	<s:Label x="304" y="237" text="strzyżenie damskie:"/>
+	<s:Label x="304" y="279" text="strzyżenie męskie:"/>
+	<s:Label x="303" y="321" text="strzyżenie dzieci:"/>
+	<s:Label x="303" y="361" text="modelowanie:"/>
+	<s:Label x="303" y="404" text="koloryzacja:"/>
+	<s:TextInput id="imie" x="304" y="165"/>
+	<s:TextInput id="position" x="304" y="207"/>
+	<s:TextInput id="cut_woman" x="304" y="249"/>
+	<s:TextInput id="cut_man" x="304" y="291"/>
+	<s:TextInput id="cut_kids" x="303" y="333"/>
+	<s:TextInput id="model" x="303" y="375"/>
+	<s:TextInput id="color" x="303" y="418"/>
+	<s:TextArea id="quotation" x="10" y="71" width="277" fontStyle="italic"/>
+	<s:TextArea id="description" x="10" y="258" width="277"/>
+	<components:ButtonAddEdit id="buttonAddEdit" x="187" y="422" kind="{this.kind}"/>
+	<s:Image id="img" x="305" y="10" width="129" height="129"/>
+	<s:Button x="159" y="10" width="129" label="dodaj zdjęcie"
+			  click="{ dispatchEvent( new Event('showGalleryWin', true) ) }" cornerRadius="0"/>
+	
+</s:TitleWindow>

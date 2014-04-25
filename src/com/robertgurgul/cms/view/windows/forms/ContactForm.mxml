@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:parsley="http://www.spicefactory.org/parsley"
+			   width="602" height="490" close="popUp.closeHandler()"
+			   title="Formularz kontaktowy w sprawie systemu CMS">
+	
+	<fx:Declarations>
+		<parsley:Configure/>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.message.utils.ContactMessage;
+			import com.robertgurgul.cms.utils.PopUp;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			protected function button1_clickHandler(event:MouseEvent):void
+			{
+				dispatcher( new ContactMessage(titlee.text, email.text, desc.text) );
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:TextInput id="titlee" x="10" y="31" width="580"/>
+	<s:TextInput id="email" x="10" y="84" width="580"/>
+	<s:Label x="10" y="15" height="25" text="Tytuł:"/>
+	<s:Label x="10" y="68" height="25" text="Twój e-mail:"/>
+	<s:Label x="10" y="122" height="25" text="opis problemu:"/>
+	<s:TextArea id="desc" x="10" y="138" width="580" height="272"/>
+	
+	<s:controlBarContent>
+		<s:HGroup verticalAlign="baseline">
+			<s:Button label="Wyślij" click="button1_clickHandler(event)"/>
+		</s:HGroup>
+	</s:controlBarContent>
+</s:TitleWindow>

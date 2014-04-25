@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:parsley="http://www.spicefactory.org/parsley"
+		 width="400" height="26">
+	
+	<fx:Declarations>
+		<parsley:Configure />
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.message.pages.PageMessage;
+			import com.robertgurgul.cms.model.DataHolder;
+			import com.robertgurgul.cms.vo.PageVo;
+			public var control:Tlf_control;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			private function sendToDB(event:MouseEvent):void
+			{
+				var pageVo:PageVo = new PageVo();
+				pageVo.id = DataHolder.getInstance().currentPage.id;
+				pageVo.title = control.title.text; 
+				pageVo.kat = DataHolder.getInstance().currentPage.kat;
+				pageVo.descTLF = control.strTLF; 
+				pageVo.descHTML = control.strHTML;
+				
+				dispatcher( new PageMessage(PageMessage.EDIT_PAGE, pageVo) );
+			}
+		]]>
+	</fx:Script>
+	
+	<s:Button id="btnexportToHtml" x="10" y="0" width="111" label="export to HTML"
+			  click="control.exportToHtml(event);" enabled="false"/>
+	<s:Button enabled="{ Controller.getInstance().btnSaveEnabled }" id="saveInDB" 
+			  x="130" y="0" width="111" label="zapisz w bazie" click="sendToDB(event)" />
+</s:Group>

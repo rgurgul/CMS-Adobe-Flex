@@ -1,0 +1,194 @@
+<?xml version="1.0" encoding="utf-8"?>
+<mx:Application xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				xmlns:view="com.robertgurgul.cms.view.*"
+				xmlns:windows="com.robertgurgul.cms.view.windows.*"
+				xmlns:parsley="http://www.spicefactory.org/parsley"
+				xmlns:pages="com.robertgurgul.cms.view.pages.*"
+				xmlns:BottomBar="com.robertgurgul.cms.view.BottomBar.*"
+				backgroundColor="0x94aab5" creationComplete="init()" horizontalCenter="0"
+				verticalCenter="0">
+	
+	<fx:Style source="assets/css/styles.css"/>
+	<fx:Style source="assets/css/DefaultCss.css"/>
+	
+	<fx:Declarations>
+		<mx:XMLListCollection id="xmlListColl"/>
+		<parsley:Configure/>
+		<parsley:ContextBuilder>
+			<parsley:ViewSettings autowireComponents="true"/>
+			<parsley:FlexConfig type="com.robertgurgul.cms.config.ParsleyContext"/>
+		</parsley:ContextBuilder>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.message.pages.PageMessage;
+			import com.robertgurgul.cms.message.utils.LoginMessage;
+			import com.robertgurgul.cms.model.DataHolder;
+			import com.robertgurgul.cms.remoting.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			import com.robertgurgul.cms.view.windows.*;
+			import com.robertgurgul.cms.view.windows.forms.ContactForm;
+			import com.robertgurgul.cms.view.windows.login.LoginPanel;
+			
+			import mx.collections.ArrayCollection;
+			import mx.managers.PopUpManager;
+			import mx.managers.ToolTipManager;
+			import mx.rpc.events.ResultEvent;
+			
+			import org.spicefactory.parsley.core.context.Context;
+			
+			[Bindable] public var control:Tlf_control;
+			ToolTipManager.showDelay = 0;
+			
+			private var urlLdr:URLLoader = new URLLoader();
+			private var login:LoginPanel;
+			
+			[Inject]
+			public var context:Context;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			private function loadXML(targetURL:String):void {
+				urlLdr.load(new URLRequest(targetURL));
+				urlLdr.addEventListener(Event.COMPLETE, config_complete);
+			}
+			
+			private function config_complete(evt:Event):void 
+			{
+				XML.ignoreWhitespace = true;
+				var xmlData:XML = new XML(evt.currentTarget.data);
+				xmlListColl = new XMLListCollection(xmlData.children());			
+				Utils.path = xmlListColl[3].attribute('val');
+				
+				if(xmlListColl.length != 0)
+				{
+					for each (var configList:XML in xmlListColl)
+					{
+					}
+				}
+			}
+			
+			[Init]
+			public function parsleyInit():void
+			{
+				showLoginPopUp();
+				
+			}
+			
+			[CommandResult(selector="GET_PAGE")]
+			public function pageResult (result: Object, trigger:PageMessage) : void 
+			{
+				var obj:ArrayCollection = result as ArrayCollection;
+				DataHolder.getInstance().dataPage = obj[0];
+				control.initText();
+				Utils.changeViewStack = 0;
+				Controller.getInstance().btnSaveEnabled = true;
+			}
+			
+			private function result (result: ResultEvent): void 
+			{
+				dispatchEvent( new Event('onGetMenu', true) );
+			}
+			
+			protected function init():void
+			{
+				loadXML('config.xml')
+				control = new Tlf_control(editableContainer, navBar.graphicBar, navBar.linkBar, navBar.controlBar);
+				ServiceConnector.getInstance().addEventListener('onGetPage', control.initText);
+				ServiceConnector.getInstance().addEventListener('onGetMenu', menu.init);
+				hDividedBox.getDividerAt(0).visible = false;
+				hDividedBox2.getDividerAt(0).visible = false;
+				hDividedBox3.getDividerAt(0).visible = false;
+			}
+			
+ 			[MessageHandler(selector="showCMS")]
+			public function okMessage(logMessage:LoginMessage):void
+			{
+				PopUpManager.removePopUp(login);
+				showCMS();	
+			} 
+			
+			protected function showCMS(event:Event = null):void
+			{
+				popUp.closeHandler();
+				panelCMS.visible = true;
+			} 
+			protected function hideCMS(event:Event):void
+			{
+				showLoginPopUp();
+				panelCMS.visible = false;
+			}
+			
+			private function showLoginPopUp():void
+			{
+				popUp.showWindow( new LoginPanel() );
+			}
+			
+		]]>
+	</fx:Script>
+		
+	<mx:Panel id="panelCMS" visible="false" height="100%" backgroundColor="0x94AAB5"
+			  borderColor="0x000000" color="0x000000" horizontalAlign="center" layout="vertical"
+			  paddingBottom="5" paddingLeft="5" paddingRight="5" paddingTop="5"
+			  title="TENSALON - CMS">
+		<mx:HDividedBox id="hDividedBox" height="100%" horizontalGap="5" verticalGap="5">
+			<mx:VDividedBox id="hDividedBox2" height="100%" verticalGap="5">
+				<mx:Canvas height="100%" backgroundColor="0xE8F6F9">
+					<view:Menu id="menu"></view:Menu>
+				</mx:Canvas>
+				<s:Group>
+					<s:Rect width="210" height="100%">
+						<s:fill><s:SolidColor color="#F7F7F7"/></s:fill>
+					</s:Rect>
+					<s:Image x="5" bottom="0" click="popUp.showWindow(new ContactForm())"
+							 source="@Embed('assets/btn_contact.png')" toolTip="uwagi"/>
+					<s:Image x="35" bottom="0" click="hideCMS(event)"
+							 source="@Embed('assets/logout.png')" toolTip="wyloguj się"/>
+				</s:Group>
+			</mx:VDividedBox>
+			<mx:VDividedBox id="hDividedBox3" width="100%" height="100%" verticalGap="5">
+<!--				<mx:Canvas label="Canvas 1" width="100%" height="100%" color="0x323232" backgroundColor="#ACACAC">-->
+				<mx:Canvas x="0" y="0" height="100%">
+					<s:Label id="youAreIn" width="100%" height="12" backgroundColor="0xE5E5E5"
+							 paddingLeft="2" paddingTop="1" text="{ Utils.youAreIn }"></s:Label>
+					<mx:ViewStack id="stackViews" x="0" y="18" height="100%" borderStyle="solid"
+								  borderVisible="false" selectedIndex="{ Utils.changeViewStack }">
+						<s:NavigatorContent width="715" height="100%">
+							<pages:PageEditableContainer id="editableContainer" width="715"
+														 height="100%"></pages:PageEditableContainer>
+						</s:NavigatorContent>
+						<s:NavigatorContent width="715" height="100%" backgroundColor="0xeaeaea">
+							<pages:Products></pages:Products>
+						</s:NavigatorContent>
+						<s:NavigatorContent width="715" height="100%" backgroundColor="0xeaeaea">
+							<pages:News></pages:News>
+						</s:NavigatorContent>
+						<s:NavigatorContent width="715" height="100%" backgroundColor="0xeaeaea">
+							<pages:Portfolio/>
+						</s:NavigatorContent>
+						<s:NavigatorContent width="715" height="100%" backgroundColor="0xeaeaea">
+							<pages:Edukacja/>
+						</s:NavigatorContent>
+						<s:NavigatorContent width="715" height="100%" backgroundColor="0xeaeaea">
+							<pages:HomeImg/>
+						</s:NavigatorContent>
+						<s:NavigatorContent width="715" height="100%" backgroundColor="0xeaeaea">
+							<pages:Members/>
+						</s:NavigatorContent>
+					</mx:ViewStack>
+				</mx:Canvas>
+				<mx:Canvas bottom="0" width="100%" label="Canvas 2" backgroundColor="#C4D0D7">
+					<BottomBar:BottomNav id="navBar" bottom="0" width="100%" control="{ control }"></BottomBar:BottomNav>
+				</mx:Canvas>
+			</mx:VDividedBox>
+		</mx:HDividedBox>
+	</mx:Panel>
+</mx:Application>

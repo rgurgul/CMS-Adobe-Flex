@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009" 
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx" xmlns:view="com.robertgurgul.cms.view.*" xmlns:BottomBar="com.robertgurgul.cms.view.BottomBar.*">
+
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;			
+			[Bindable] public var control:Tlf_control;
+		]]>
+	</fx:Script>
+
+	
+	<mx:TabNavigator id="bottomTabs" width="100%" creationPolicy="all" borderColor="#000000" height="62"
+					 contentBackgroundColor="#eaeaea" backgroundColor="#E5E5E5" color="#202020">
+		<mx:VBox label="TEXT" width="100%">
+			<BottomBar:ControlTextBar id="controlBar" control="{ control }">
+				
+			</BottomBar:ControlTextBar>
+		</mx:VBox>
+		<mx:VBox label="LINKI" width="100%">
+			<BottomBar:LinkBar id="linkBar" control="{ control }">
+				
+			</BottomBar:LinkBar>
+		</mx:VBox>
+		<mx:VBox label="OBRAZKI" width="100%">
+			<BottomBar:GraphicBar id="graphicBar" control="{ control }" width="100%">
+				
+			</BottomBar:GraphicBar>
+		</mx:VBox>
+		<mx:VBox label="ZAPIS" width="100%">
+			<BottomBar:OperationBar control="{ control }">
+				
+			</BottomBar:OperationBar>
+		</mx:VBox>
+		
+	</mx:TabNavigator>
+</s:Group>

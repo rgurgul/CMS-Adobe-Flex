@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+					xmlns:s="library://ns.adobe.com/flex/spark"
+					xmlns:mx="library://ns.adobe.com/flex/mx"
+					xmlns:parsley="http://www.spicefactory.org/parsley"
+					width="100%" height="100%" click="clickHandler(event)"
+					creationComplete="init();">
+	
+	<fx:Declarations>
+		<!--<parsley:Configure />-->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.message.pages.ProductsMessage;
+			import com.robertgurgul.cms.remoting.*;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			protected function init():void
+			{
+				
+			}
+			
+			protected function clickHandler(event:MouseEvent):void
+			{
+				parentDocument.parent.parent.showItemWin('EDIT');
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="active"/>
+	</s:states>
+	
+	<s:BitmapImage includeIn="active" horizontalCenter="0" source="@Embed('assets/btn_edit.png')"
+				   verticalCenter="0"/>
+	
+</s:GridItemRenderer>

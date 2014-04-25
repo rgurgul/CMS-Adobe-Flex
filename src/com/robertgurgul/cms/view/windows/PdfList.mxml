@@ -1,0 +1,34 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:parsley="http://www.spicefactory.org/parsley"
+			   width="540" height="386" close="Utils.closeHandler2()" title="Lista plikow pdf">
+	
+	<fx:Declarations>
+		<parsley:Configure/>
+	</fx:Declarations>
+
+	<fx:Script>	
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.remoting.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			
+			[Inject]
+			public var popUp:PopUp;
+
+		]]>
+	</fx:Script>
+	
+	<s:controlBarContent>
+		<s:HGroup verticalAlign="baseline">
+			<!--<s:Button x="10" y="108" label="Wyślij" click="{ ServiceConnector.getInstance().addMenu(sub.text, kindCMS) }" cornerRadius="0"/>-->
+		</s:HGroup>
+	</s:controlBarContent>
+	<s:List id="listaPdf" x="10" y="10" width="518" height="318"
+			click="{ DataHolder.getInstance().linkuj = '/assets/imgs/uploads/' + listaPdf.selectedItem }"
+			dataProvider="{ DataHolder.getInstance().pdfs }"></s:List>
+	
+</s:TitleWindow>

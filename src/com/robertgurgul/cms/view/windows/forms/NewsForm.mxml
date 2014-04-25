@@ -1,0 +1,136 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:view="com.robertgurgul.cms.view.*"
+			   xmlns:components="com.robertgurgul.cms.components.*"
+			   xmlns:parsley="http://www.spicefactory.org/parsley"
+			   width="356" height="330" close="popUp.closeHandler()" creationComplete="init()"
+			   title="Dodanie/Aktualizacja: promocja/news">
+
+	<fx:Declarations>
+		<parsley:Configure/>
+	</fx:Declarations>
+	
+	<fx:Script>	
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.message.pages.NewsMessage;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.remoting.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			import com.robertgurgul.cms.utils.Validator;
+			import com.robertgurgul.cms.vo.NewsVo;
+			
+			import mx.controls.Alert;
+			
+			[Bindable] public var kind:String;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			public var idToEdit:int;
+			public var newsToUpdate:Object;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			private function init():void
+			{
+				if(newsToUpdate)
+				{
+					editor.text = newsToUpdate.textTlf;
+					date.text = newsToUpdate.date;
+					newsOrPromotion.selectedIndex = int(newsToUpdate.kind);
+				}
+				
+				buttonAddEdit.addEventListener("btnClicked", btnClicked);
+			}
+			
+			protected function btnClicked(event:Event):void
+			{
+				switch(event.currentTarget.selection)
+				{
+					case "ADD_GO":
+						addNews();
+						break;
+					case "EDIT_GO":
+						editNews();
+						break;
+				}
+			}
+
+			private function createNewsVo():NewsVo
+			{
+				var news:NewsVo = new NewsVo();
+				news.id = newsToUpdate ? newsToUpdate.id : NaN;
+				news.kind = String(newsOrPromotion.selectedIndex);
+				news.date = date.text;
+				news.textHtml = editor.text;
+				news.textTlf = editor.text;
+				return news;
+			}
+ 			
+			public function addNews():void
+			{
+				if(validatorion())
+				{
+					dispatcher( new NewsMessage(NewsMessage.ADD_NEWS, createNewsVo() ) );
+					popUp.closeHandler();
+				} else {
+					Alert.show("Proszę uzupełnić formularz");
+				}
+			}
+			
+			public function editNews():void
+			{
+				if(validatorion())
+				{
+					dispatcher( new NewsMessage(NewsMessage.UPDATE_NEWS, createNewsVo() ) );
+					popUp.closeHandler();	
+				} else {
+					Alert.show("Proszę uzupełnić formularz");
+				}
+			} 
+			
+			private function validatorion():Boolean
+			{
+				var result:Boolean = Validator.valid(
+					newsOrPromotion.selectedIndex, 
+					 editor.text, 
+					 editor.text);
+				return result;
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:Label x="157" y="23" text="Rodzaj:"/>
+	<s:DropDownList id="newsOrPromotion" x="157" y="43" width="187" cornerRadius="0"
+					labelField="kind">
+		<s:dataProvider>
+			<mx:ArrayList>
+				<fx:String>PROMOCJA</fx:String>
+				<fx:String>NEWS</fx:String>
+			</mx:ArrayList>
+		</s:dataProvider>
+	</s:DropDownList>
+	
+	<s:Label x="157" y="72" text="Data:"/>
+	<mx:TextInput id="date" x="157" y="86" width="187" height="20" borderVisible="true"
+				  paddingLeft="2"/>
+	
+	<s:Label x="11" y="110" text="Text:"/>
+	<s:RichEditableText id="editor" x="11" y="130" width="334" height="121"
+						backgroundColor="0xF7F7F7" lineBreak="toFit">
+	</s:RichEditableText>
+	
+	<mx:VRule x="147" y="23" height="83"/>
+	
+	<s:controlBarContent>
+		<s:HGroup verticalAlign="baseline">
+			<components:ButtonAddEdit id="buttonAddEdit" x="10" y="108" kind="{this.kind}"/>
+		</s:HGroup>
+	</s:controlBarContent>
+	
+</s:TitleWindow>

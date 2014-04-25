@@ -1,0 +1,125 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:view="com.robertgurgul.cms.view.*"
+		 xmlns:parsley="http://www.spicefactory.org/parsley"
+		 xmlns:skins="com.robertgurgul.cms.skins.*"
+		 xmlns:components="com.robertgurgul.cms.components.*"
+		 width="715" height="100%" creationComplete="init();">
+	
+	<fx:Declarations>
+		<!--<parsley:Configure />-->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.darronschall.serialization.ObjectTranslator;
+			import com.robertgurgul.cms.message.gallery.GalleryMessage;
+			import com.robertgurgul.cms.message.pages.ProductsMessage;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			import com.robertgurgul.cms.view.windows.GalleryBox;
+			import com.robertgurgul.cms.view.windows.forms.ProductForm;
+			import com.robertgurgul.cms.vo.ProductVo;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import org.spicefactory.parsley.core.context.Context;
+			
+			import spark.components.TitleWindow;
+			
+			private var productWin:ProductForm;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			[Inject]
+			public var context:Context;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			private var galleryBox:GalleryBox;
+
+			private function init():void
+			{
+			}
+			public function deleteProduct(product:Object):void
+			{
+				var objToRemove:ProductVo = ObjectTranslator.objectToInstance( product, ProductVo ) as ProductVo;
+				dispatcher( new ProductsMessage( ProductsMessage.REMOVE_PRODUCT, objToRemove ) );
+			}
+			
+			public function showItemWin(kind:String):void
+			{
+				productWin = new ProductForm();
+				productWin.kind = kind;
+				productWin.productToUpdate = kind == 'EDIT' ? dg.selectedItem : null ;
+				context.viewManager.addViewRoot(productWin);
+				popUp.showWindow( productWin );
+				productWin.addEventListener('showGalleryWin', showGalleryWin);
+			}
+			protected function showGalleryWin(event:Event):void
+			{
+				galleryBox = new GalleryBox();
+				galleryBox.link = GalleryMessage.LINK_PRODUCTS_FOLDER;
+				context.viewManager.addViewRoot( galleryBox );
+				PopUpManager.addPopUp(galleryBox, FlexGlobals.topLevelApplication.panelCMS, true);
+				PopUpManager.centerPopUp(galleryBox as TitleWindow); 
+				galleryBox.addEventListener('setImageURL', setImageURL);
+			}	
+			protected function setImageURL(e:Event):void
+			{
+				productWin.img.source = GalleryMessage.LINK_PRODUCTS_FOLDER + e.target.selectImg;
+			}
+
+			[CommandResult(selector="GET_PRODUCT")]
+			public function productResult (result: Object, trigger:ProductsMessage) : void 
+			{
+				dg.dataProvider = null;
+				var obj:ArrayCollection = result as ArrayCollection;
+				dg.dataProvider = obj;
+			}
+			
+			[CommandResult(selector="REMOVE_PRODUCT")]
+			public function removePostResult (result: Object, trigger:ProductsMessage) : void 
+			{
+				Alert.show('usunięto z serwera', String(result));
+				dispatcher( new ProductsMessage(ProductsMessage.GET_PRODUCTS ) );
+			}
+			[CommandResult(selector="ADD_PRODUCT")]
+			public function addedPostResult (result: Object, trigger:ProductsMessage) : void 
+			{
+				Alert.show('dodano nowy produkt');
+				dispatcher( new ProductsMessage(ProductsMessage.GET_PRODUCTS ) );
+			}
+			[CommandResult(selector="UPDATE_PRODUCT")]
+			public function editedPostResult (result: Object, trigger:ProductsMessage) : void 
+			{
+				Alert.show('zaktualizowano produkt', String(result));
+				dispatcher( new ProductsMessage(ProductsMessage.GET_PRODUCTS ) );
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:Button label="Dodaj nowy produkt" click="showItemWin('ADD')"/>
+	
+	<components:CustomDataGrid id="dg" y="25" width="100%" height="100%" automationName="products"
+							   requestedRowCount="4">
+		<components:columns>
+			<s:ArrayList>
+				<s:GridColumn dataField="title" headerText="Tytuł"></s:GridColumn>
+				<s:GridColumn width="55" dataField="dataField2" headerText="Edycja"
+							  itemRenderer="com.robertgurgul.cms.view.renderers.CustomDG.IconEdit"></s:GridColumn>
+				<s:GridColumn width="45" dataField="dataField3" headerText="Usuń"
+							  itemRenderer="com.robertgurgul.cms.view.renderers.CustomDG.IconRemove"></s:GridColumn>
+			</s:ArrayList>
+		</components:columns>
+	</components:CustomDataGrid>
+
+</s:Group>

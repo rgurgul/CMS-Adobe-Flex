@@ -1,0 +1,127 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:view="com.robertgurgul.cms.view.*"
+			   xmlns:components="com.robertgurgul.cms.components.*"
+			   xmlns:parsley="http://www.spicefactory.org/parsley"
+			   width="356" height="270" close="popUp.closeHandler()" creationComplete="init()"
+			   title="Dodanie/Aktualizacja zdjęcia.">
+	
+	<fx:Declarations>
+		<parsley:Configure/>
+	</fx:Declarations>
+	
+	<fx:Script>	
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.message.pages.HomeImgMessage;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.remoting.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			import com.robertgurgul.cms.utils.Validator;
+			import com.robertgurgul.cms.vo.HomeImgVo;
+			
+			import mx.controls.Alert;
+			
+			[Bindable] public var kind:String;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			public var idToEdit:int;
+			public var item:Object;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			private function init():void
+			{
+				if(item)
+				{
+					img.source = item.imgSrc;
+					place.selectedIndex = int(item.place);
+				}
+				
+				buttonAddEdit.addEventListener("btnClicked", btnClicked);
+			}
+			
+			private function createHomeImgVo():HomeImgVo
+			{
+				var homeImgVo:HomeImgVo = new HomeImgVo();
+				homeImgVo.id = item ? item.id : NaN;
+				homeImgVo.imgSrc = String(img.source);
+				homeImgVo.dir = "dir";
+				homeImgVo.place = String(place.selectedIndex);
+				return homeImgVo;
+			}
+ 			
+			public function addImg():void
+			{
+				if(validatorion())
+				{
+					dispatcher( new HomeImgMessage(HomeImgMessage.ADD_IMG, createHomeImgVo() ) );
+					popUp.closeHandler();
+				} else {
+					Alert.show("Proszę uzupełnić formularz");
+				}
+			} 
+			
+			public function editImg():void
+			{
+				if(validatorion())
+				{
+					dispatcher( new HomeImgMessage(HomeImgMessage.EDIT_IMG, createHomeImgVo() ) );
+					popUp.closeHandler();	
+				} else {
+					Alert.show("Proszę uzupełnić formularz");
+				}
+			}  
+			
+			private function validatorion():Boolean
+			{
+				var result:Boolean = Validator.valid(String(img.source),  place.selectedIndex);
+				return result;
+			}
+			
+			protected function btnClicked(event:Event):void
+			{
+				switch(event.currentTarget.selection)
+				{
+					case "ADD_GO":
+						addImg();
+						break;
+					case "EDIT_GO":
+						editImg();
+						break;
+				}
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:Button x="10" y="23" width="129" label="dodaj zdjęcie"
+			  click="{ dispatchEvent( new Event('showGalleryWin', true) ) }" cornerRadius="0"/>
+	
+	<s:DropDownList id="place" x="157" y="43" width="187" cornerRadius="0" labelField="name">
+		<s:dataProvider>
+			<mx:ArrayList>
+				<fx:String>left</fx:String>
+				<fx:String>right-top</fx:String>
+				<fx:String>right-bottom</fx:String>
+			</mx:ArrayList>
+		</s:dataProvider>
+	</s:DropDownList>
+	
+	<s:Image id="img" x="10" y="52" width="129" height="129"/>
+	
+	<s:Label x="157" y="23" text="ułożenie:"/>
+	<mx:VRule x="147" y="23" height="158"/>
+	
+	<s:controlBarContent>
+		<s:HGroup verticalAlign="baseline">
+			<components:ButtonAddEdit id="buttonAddEdit" x="10" y="108" kind="{this.kind}"/>
+		</s:HGroup>
+	</s:controlBarContent>
+	
+</s:TitleWindow>

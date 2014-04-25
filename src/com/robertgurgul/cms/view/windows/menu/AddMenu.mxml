@@ -1,0 +1,80 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:parsley="http://www.spicefactory.org/parsley"
+			   width="336" height="164" close="popUp.closeHandler()"
+			   title="Dodanie nowego przycisku w menu głownego.">
+
+	<fx:Declarations>
+		<parsley:Configure/>
+	</fx:Declarations>
+	
+	<fx:Script>	
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.message.utils.MenuMessage;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.remoting.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+
+			protected function clickHandler(event:MouseEvent):void
+			{
+				if (itemName.text != '' && kindCMS.selectedIndex != -1)
+				{
+					Alert.show('chcesz dodać nową zakladke w menu gł: \r' + itemName.text, "Potwierdź",Alert.OK | Alert.CANCEL, null, 
+						function(eventObj:CloseEvent):void
+						{
+							if(eventObj.detail==Alert.OK) 
+								dispatcher( new MenuMessage(MenuMessage.ADD_MENU_ITEM, itemName.text, kindCMS.selectedItem) )
+						});	
+				} else {
+					Alert.show('proszę wybrać charekter i nazwę podstrony');
+				}
+			}
+			
+			[CommandResult(selector="ADD_MENU_ITEM")]
+			public function addedPostResult (result: Object, trigger:MenuMessage) : void 
+			{
+				Alert.show('dodano');
+				dispatcher( new MenuMessage(MenuMessage.GET_MENU) );
+			}
+			
+		]]>
+	</fx:Script>
+	
+	<s:TextInput id="itemName" x="177" y="15" width="147"/>
+	
+	<!--<s:Button x="10" y="102" label="Wyślij" click="{ 
+			  kindCMS.selectedIndex != -1
+			  ? ServiceConnector.getInstance().addMenu(sub.text, kindCMS) 
+			  : Alert.show('proszę wybrać charekter i nazwę podstrony') }"/>-->
+	<s:DropDownList id="kindCMS" x="177" y="63" width="147" cornerRadius="0" labelField="name">
+		<s:dataProvider>
+			<mx:ArrayList>
+				<fx:String>text</fx:String>
+				<fx:String>post</fx:String>
+				<fx:String>lista</fx:String>
+			</mx:ArrayList>
+		</s:dataProvider>
+	</s:DropDownList>
+	<s:Label x="10" y="14" text="Nazwa nowej zakładki &#xd;w menu gł.:"/>
+	<s:Label x="10" y="67" text="Typ strony:"/>
+	<mx:HRule x="10" y="49" width="314" height="2"/>
+	
+	<s:controlBarContent>
+		<s:HGroup verticalAlign="baseline">
+			<s:Button x="10" y="108" label="Wyślij" click="clickHandler(event)"/>
+		</s:HGroup>
+	</s:controlBarContent>
+	
+</s:TitleWindow>

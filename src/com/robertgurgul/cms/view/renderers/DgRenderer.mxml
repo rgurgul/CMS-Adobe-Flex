@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:ItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+				xmlns:s="library://ns.adobe.com/flex/spark"
+				xmlns:mx="library://ns.adobe.com/flex/mx"
+				width="80" height="80" autoDrawBackground="false" clipAndEnableScrolling="false"
+				depth="0"
+				depth.hovered="1">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+
+			public var selectImg:String = 'nic';
+			public var selectedIndex:int;
+			public var idImgToRemove:int;
+			
+			protected function group_clickHandler(event:MouseEvent):void
+			{
+				selectImg = data.imgSrc;
+				dispatchEvent( new Event('setImageURL', true) );
+				parentDocument.closeHandler();
+			}
+		]]>
+	</fx:Script>
+	
+	<s:states>
+		<s:State name="normal"/>
+		<s:State name="hovered"/>
+	</s:states>
+
+	<s:transitions>
+		<s:Transition autoReverse="true" fromState="normal" toState="hovered">
+			<s:Parallel target="{image}">
+				<s:Resize duration="200" startDelay="0"/>
+				<s:Fade startDelay="100" target="{image}"/>
+			</s:Parallel>
+		</s:Transition>
+	</s:transitions>
+	
+	<s:Image id="image" click="group_clickHandler(event)" horizontalCenter="0" scaleX="1" scaleY="1"
+			 smooth="true" source="{data.dir + data.imgSrc}" verticalCenter="0"
+			 width.hovered="70" height.hovered="70"
+			 width.normal="50" height.normal="50"/>
+	
+	<s:RichText top="70" width="120" color="black" fontSize="8" horizontalCenter="0"
+				styleName="embeddedFont" textAlign="center"
+				textFlow="{ Utils.convertText(data.imgSrc) }"/>
+
+</s:ItemRenderer>

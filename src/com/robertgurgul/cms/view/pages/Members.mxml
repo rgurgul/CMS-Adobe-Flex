@@ -1,0 +1,140 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark"
+		 xmlns:mx="library://ns.adobe.com/flex/mx"
+		 xmlns:view="com.robertgurgul.cms.view.*"
+		 width="715" height="100%" 
+		 creationComplete="init();"
+		 xmlns:parsley="http://www.spicefactory.org/parsley" 
+		 xmlns:skins="com.robertgurgul.cms.skins.*"
+		 xmlns:components="com.robertgurgul.cms.components.*">
+	
+	<fx:Declarations>
+		<!--<parsley:Configure />-->
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[
+			import com.darronschall.serialization.ObjectTranslator;
+			import com.robertgurgul.cms.message.gallery.GalleryMessage;
+			import com.robertgurgul.cms.message.pages.MemberMessage;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			import com.robertgurgul.cms.view.windows.GalleryBox;
+			import com.robertgurgul.cms.view.windows.forms.MemberForm;
+			import com.robertgurgul.cms.vo.MemberVo;
+			
+			import mx.collections.ArrayCollection;
+			import mx.controls.Alert;
+			import mx.core.FlexGlobals;
+			import mx.managers.PopUpManager;
+			
+			import org.spicefactory.parsley.core.context.Context;
+			
+			import spark.components.TitleWindow;
+			
+			private var memberWin:MemberForm;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			[Inject]
+			public var context:Context;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			private var galleryBox:GalleryBox;
+			
+			private function init():void
+			{
+			}
+			
+			protected function showGalleryWin(event:Event):void
+			{
+				galleryBox = new GalleryBox();
+				galleryBox.link = GalleryMessage.LINK_MEMBERS;
+				context.viewManager.addViewRoot( galleryBox );
+				PopUpManager.addPopUp(galleryBox, FlexGlobals.topLevelApplication.panelCMS, true);
+				PopUpManager.centerPopUp(galleryBox as TitleWindow); 
+				galleryBox.addEventListener('setImageURL', setImageURL);
+			}
+
+			protected function setImageURL(e:Event):void
+			{
+				memberWin.img.source = GalleryMessage.LINK_MEMBERS + e.target.selectImg;
+			}
+			
+			public function deleteProduct(member:Object):void
+			{
+				var objToMember:MemberVo = ObjectTranslator.objectToInstance( member, MemberVo ) as MemberVo;
+				dispatcher( new MemberMessage( MemberMessage.REMOVE_MEMBER, objToMember ) );
+			}
+			
+			public function showItemWin(kind:String):void
+			{
+				memberWin = new MemberForm();
+				memberWin.kind = kind;
+				memberWin.memberToUpdate= kind == 'EDIT' ? dg.selectedItem : null ;
+				context.viewManager.addViewRoot(memberWin);
+				memberWin.addEventListener('showGalleryWin', showGalleryWin);	
+				popUp.showWindow( memberWin );
+			}
+			
+			[CommandResult(selector="GET_MEMBERS")]
+			public function memberResult (result: Object, trigger:MemberMessage) : void 
+			{
+				dg.dataProvider = null;
+				var obj:ArrayCollection = result as ArrayCollection;
+				dg.dataProvider = obj;
+			}
+			
+
+			[CommandResult(selector="REMOVE_MEMBER")]
+			public function removeNewsResult (result: Object, trigger:MemberMessage) : void 
+			{
+				if(result == true)
+				{
+					Alert.show('usunięto z serwera', String(result));
+					dispatcher( new MemberMessage(MemberMessage.GET_MEMBERS ) );
+				}
+			}
+			
+			[CommandResult(selector="ADD_MEMBER")]
+			public function addedNewsResult (result: Object, trigger:MemberMessage) : void 
+			{
+				if(result == true)
+				{
+					Alert.show('pracownik dodany', String(result));
+					dispatcher( new MemberMessage(MemberMessage.GET_MEMBERS ) );
+				}
+			}
+			
+			[CommandResult(selector="UPDATE_MEMBER")]
+			public function editedNewsResult (result: Object, trigger:MemberMessage) : void 
+			{
+				if(result == true)
+				{
+					Alert.show('zaktualizowano pracownika');
+					dispatcher( new MemberMessage(MemberMessage.GET_MEMBERS ) );	
+				}
+			}
+
+		]]>
+	</fx:Script>
+	
+	<s:Button label="Dodaj nowego pracownika" click="showItemWin('ADD')" cornerRadius="0"/>
+	
+	<components:CustomDataGrid y="25" width="100%" id="dg" height="100%" 
+							   automationName="team" requestedRowCount="4">
+		<components:columns>
+			<s:ArrayList>
+				<s:GridColumn dataField="name" headerText="Imię"></s:GridColumn>
+				<s:GridColumn dataField="position" headerText="Stanowisko"></s:GridColumn>
+				<s:GridColumn dataField="dataField2" headerText="Edycja" itemRenderer="com.robertgurgul.cms.view.renderers.CustomDG.IconEdit" width="55"></s:GridColumn>
+				<s:GridColumn dataField="dataField3" headerText="Usuń" itemRenderer="com.robertgurgul.cms.view.renderers.CustomDG.IconRemove" width="45"></s:GridColumn>
+			</s:ArrayList>
+		</components:columns>
+	</components:CustomDataGrid>
+	
+</s:Group>

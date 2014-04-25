@@ -1,0 +1,152 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:view="com.robertgurgul.cms.view.*"
+			   xmlns:components="com.robertgurgul.cms.components.*"
+			   xmlns:parsley="http://www.spicefactory.org/parsley"
+			   width="356" height="440" close="popUp.closeHandler()" creationComplete="init()"
+			   title="Dodanie/Aktualizacja produktu.">
+
+	<fx:Declarations>
+		<parsley:Configure/>
+	</fx:Declarations>
+	
+	<fx:Script>	
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.message.pages.ProductsMessage;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.remoting.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			import com.robertgurgul.cms.utils.Validator;
+			import com.robertgurgul.cms.vo.ProductVo;
+			
+			import mx.controls.Alert;
+			
+			[Bindable] public var kind:String;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			public var productToUpdate:Object;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			private function init():void
+			{
+				if(productToUpdate)
+				{
+					titlee.text = productToUpdate.title;
+					editor.text = productToUpdate.descTLF;
+					img.source = productToUpdate.img;
+					price.text = String(productToUpdate.price);
+					pricePromo.text = String(productToUpdate.pricePromo);
+					company.selectedIndex = int(productToUpdate.company);
+				}
+				
+				buttonAddEdit.addEventListener("btnClicked", btnClicked);
+			}
+			
+			protected function btnClicked(event:Event):void
+			{
+				switch(event.currentTarget.selection)
+				{
+					case "ADD_GO":
+						addProdukt();
+						break;
+					case "EDIT_GO":
+						editProdukt();
+						break;
+				}
+			}
+			
+			private function createProductVo():ProductVo
+			{
+				var productVo:ProductVo = new ProductVo();
+				productVo.id = productToUpdate ? productToUpdate.id : NaN;
+				productVo.img = String(img.source);
+				productVo.company = String(company.selectedIndex);
+				productVo.title = titlee.text;
+				productVo.price = int(price.text);
+				productVo.pricePromo = int(pricePromo.text);
+				productVo.descHTML = editor.text;
+				productVo.descTLF = editor.text;
+				return productVo;
+			}
+			
+			public function addProdukt():void
+			{
+				if(validatorion())
+				{
+					dispatcher( new ProductsMessage(ProductsMessage.ADD_PRODUCT, createProductVo()) );
+					popUp.closeHandler();
+				} else {
+					Alert.show("Proszę uzupełnić formularz");
+				}
+			} 
+			
+			public function editProdukt():void
+			{
+				if(validatorion())
+				{
+					dispatcher( new ProductsMessage(ProductsMessage.UPDATE_PRODUCT, createProductVo()) );
+					popUp.closeHandler();
+				} else {
+					Alert.show("Proszę uzupełnić formularz");
+				}
+			} 
+			
+			private function validatorion():Boolean
+			{
+				var result:Boolean = Validator.valid(
+					 String(img.source),  
+					 company.selectedIndex, 
+					 titlee.text, 
+					 price.text, 
+					 editor.text, 
+					 editor.text);
+				return result;
+			}
+		]]>
+	</fx:Script>
+	
+	<s:DropDownList id="company" x="157" y="43" width="187" cornerRadius="0" labelField="name">
+		<s:dataProvider>
+			<mx:ArrayList>
+				<fx:String>BUMBLE-BUMBLE</fx:String>
+				<fx:String>DAVINES</fx:String>
+				<fx:String>WAM</fx:String>
+			</mx:ArrayList>
+		</s:dataProvider>
+	</s:DropDownList>
+	
+	<mx:TextInput id="titlee" x="157" y="86" width="187" height="20" borderVisible="true"
+				  fontFamily="Serifa-Lig" paddingLeft="2"/>
+	
+	<s:RichEditableText id="editor" x="10" y="217" width="334" height="121"
+						backgroundColor="0xF7F7F7" fontFamily="Serifa-Lig" lineBreak="toFit">
+	</s:RichEditableText>
+	
+	<s:Image id="img" x="10" y="52" width="129" height="129"/>
+	<s:Button x="10" y="23" width="129" label="dodaj zdjęcie"
+			  click="{ dispatchEvent( new Event('showGalleryWin', true) ) }" cornerRadius="0"/>
+	<s:Label x="157" y="23" text="Producent:"/>
+	<mx:VRule x="147" y="23" height="158"/>
+	<s:Label x="157" y="72" text="Nazwa:"/>
+	<s:Label x="10" y="197" text="Opis:"/>
+	
+	<s:Label x="157" y="113" text="Cena:"/>
+	<s:TextInput id="price" x="157" y="126" width="187" fontFamily="Serifa-Lig"/>
+	
+	<s:Label x="157" y="155" text="Cena promocyjna:"/>
+	<s:TextInput id="pricePromo" x="157" y="169" width="187" fontFamily="Serifa-Lig"/>
+	
+	<s:controlBarContent>
+		<s:HGroup verticalAlign="baseline">
+			<components:ButtonAddEdit id="buttonAddEdit" x="10" y="108" kind="{this.kind}"/>
+		</s:HGroup>
+	</s:controlBarContent>
+	
+</s:TitleWindow>

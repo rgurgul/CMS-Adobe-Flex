@@ -1,0 +1,174 @@
+<?xml version="1.0" encoding="utf-8"?>
+<fx:Object xmlns:fx="http://ns.adobe.com/mxml/2009"
+		   xmlns:spicefactory="http://www.spicefactory.org/parsley"
+		   xmlns:components="com.robertgurgul.cms.components.*"
+		   xmlns:classes="com.robertgurgul.cms.classes.*"
+		   xmlns:utils="com.robertgurgul.cms.utils.*"
+		   xmlns:s="library://ns.adobe.com/flex/spark">
+	
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.FileUpload;
+			import com.robertgurgul.cms.command.gallery.AddGalleryImgCommand;
+			import com.robertgurgul.cms.command.gallery.GetGalleryFromFolderCommand;
+			import com.robertgurgul.cms.command.gallery.GetGalleryFromTableCommand;
+			import com.robertgurgul.cms.command.gallery.RemoveGalleryImgCommand;
+			import com.robertgurgul.cms.command.homeImg.AddHomeImgCommand;
+			import com.robertgurgul.cms.command.homeImg.EditHomeImgCommand;
+			import com.robertgurgul.cms.command.homeImg.GetHomeImgCommand;
+			import com.robertgurgul.cms.command.homeImg.RemoveHomeImgCommand;
+			import com.robertgurgul.cms.command.member.AddMemberCommand;
+			import com.robertgurgul.cms.command.member.GetMemberCommand;
+			import com.robertgurgul.cms.command.member.RemoveMemberCommand;
+			import com.robertgurgul.cms.command.member.UpdateMemberCommand;
+			import com.robertgurgul.cms.command.menu.AddMenuItemCommand;
+			import com.robertgurgul.cms.command.menu.MenuCommand;
+			import com.robertgurgul.cms.command.news.AddNewsCommand;
+			import com.robertgurgul.cms.command.news.EditNewsCommand;
+			import com.robertgurgul.cms.command.news.GetNewsCommand;
+			import com.robertgurgul.cms.command.news.RemoveNewsCommand;
+			import com.robertgurgul.cms.command.pages.EditPageCommand;
+			import com.robertgurgul.cms.command.pages.GetPageCommand;
+			import com.robertgurgul.cms.command.products.AddProductCommand;
+			import com.robertgurgul.cms.command.products.EditProductCommand;
+			import com.robertgurgul.cms.command.products.GetProductsCommand;
+			import com.robertgurgul.cms.command.products.RemoveProductCommand;
+			import com.robertgurgul.cms.command.utils.ContactCommand;
+			import com.robertgurgul.cms.command.utils.LoginCommand;
+			import com.robertgurgul.cms.command.utils.ReorderTableCommand;
+			import com.robertgurgul.cms.components.CustomDataGrid;
+			import com.robertgurgul.cms.components.CustomDataGroup;
+			import com.robertgurgul.cms.message.gallery.AddGalleryImgMessage;
+			import com.robertgurgul.cms.message.gallery.GalleryMessage;
+			import com.robertgurgul.cms.message.pages.HomeImgMessage;
+			import com.robertgurgul.cms.message.pages.MemberMessage;
+			import com.robertgurgul.cms.message.pages.NewsMessage;
+			import com.robertgurgul.cms.message.pages.PageMessage;
+			import com.robertgurgul.cms.message.pages.ProductsMessage;
+			import com.robertgurgul.cms.message.utils.ContactMessage;
+			import com.robertgurgul.cms.message.utils.LoginMessage;
+			import com.robertgurgul.cms.message.utils.MenuMessage;
+			import com.robertgurgul.cms.message.utils.ReorderTableMessage;
+			import com.robertgurgul.cms.model.DataHolder2;
+			import com.robertgurgul.cms.view.pages.Edukacja;
+			import com.robertgurgul.cms.view.pages.HomeImg;
+			import com.robertgurgul.cms.view.pages.Members;
+			import com.robertgurgul.cms.view.pages.News;
+			import com.robertgurgul.cms.view.pages.Portfolio;
+			import com.robertgurgul.cms.view.pages.Products;
+			import com.robertgurgul.cms.view.renderers.CustomDG.IconEdit;
+			import com.robertgurgul.cms.view.renderers.CustomDG.IconRemove;
+			import com.robertgurgul.cms.view.renderers.GalleryRenderer;
+			
+		]]>
+	</fx:Script>
+	
+	<fx:Declarations>
+		
+		<spicefactory:View type="{Products}"/>
+		<spicefactory:View type="{News}"/>
+		<spicefactory:View type="{Portfolio}"/>
+		<spicefactory:View type="{Edukacja}"/>
+		<spicefactory:View type="{HomeImg}"/>
+		<spicefactory:View type="{Members}"/>
+		
+		<spicefactory:View type="{IconEdit}"/>
+		<spicefactory:View type="{IconRemove}"/>
+		<spicefactory:View type="{GalleryRenderer}"/>
+		
+		<spicefactory:View type="{CustomDataGrid}"/>
+		<spicefactory:View type="{CustomDataGroup}"/>
+		
+		<components:ButtonAddEdit/>
+		<classes:FileUpload/>
+		
+		<utils:PopUp/>
+		
+		<spicefactory:MapCommand messageType="{LoginMessage}" selector="{LoginMessage.LOGIN_CHECK}">
+			<spicefactory:CommandFlow>
+				<spicefactory:Command type="{LoginCommand}">
+					<spicefactory:LinkAllResults to="{menuCommand}"/>
+				</spicefactory:Command>
+				<spicefactory:Command id="menuCommand" type="{MenuCommand}"/>
+			</spicefactory:CommandFlow>
+		</spicefactory:MapCommand>
+		
+		<spicefactory:MapCommand messageType="{PageMessage}" selector="{PageMessage.GET_PAGE}"
+								 type="{GetPageCommand}"/>
+		<spicefactory:MapCommand messageType="{PageMessage}" selector="{PageMessage.EDIT_PAGE}"
+								 type="{EditPageCommand}"/>
+		
+		<spicefactory:MapCommand messageType="{ProductsMessage}"
+								 selector="{ProductsMessage.GET_PRODUCTS}"
+								 type="{GetProductsCommand}"/>
+		<spicefactory:MapCommand messageType="{ProductsMessage}"
+								 selector="{ProductsMessage.ADD_PRODUCT}" type="{AddProductCommand}"/>
+		<spicefactory:MapCommand messageType="{ProductsMessage}"
+								 selector="{ProductsMessage.UPDATE_PRODUCT}"
+								 type="{EditProductCommand}"/>
+		<spicefactory:MapCommand messageType="{ProductsMessage}"
+								 selector="{ProductsMessage.REMOVE_PRODUCT}"
+								 type="{RemoveProductCommand}"/>
+		<spicefactory:MapCommand messageType="{ReorderTableMessage}"
+								 selector="{ReorderTableMessage.REORDER_TABLE}"
+								 type="{ReorderTableCommand}"/>
+		<spicefactory:MapCommand messageType="{GalleryMessage}"
+								 selector="{GalleryMessage.GET_GALLERY_PRODUCTS}"
+								 type="{GetGalleryFromFolderCommand}"/>
+		
+		<spicefactory:MapCommand messageType="{NewsMessage}" selector="{NewsMessage.GET_NEWS}"
+								 type="{GetNewsCommand}"/>
+		<spicefactory:MapCommand messageType="{NewsMessage}" selector="{NewsMessage.ADD_NEWS}"
+								 type="{AddNewsCommand}"/>
+		<spicefactory:MapCommand messageType="{NewsMessage}" selector="{NewsMessage.UPDATE_NEWS}"
+								 type="{EditNewsCommand}"/>
+		<spicefactory:MapCommand messageType="{NewsMessage}" selector="{NewsMessage.REMOVE_NEWS}"
+								 type="{RemoveNewsCommand}"/>
+		
+		<spicefactory:MapCommand messageType="{GalleryMessage}"
+								 selector="{GalleryMessage.GET_GALLERY_PORTFOLIO}"
+								 type="{GetGalleryFromTableCommand}"/>
+		<spicefactory:MapCommand messageType="{GalleryMessage}"
+								 selector="{GalleryMessage.GET_GALLERY_EDUKACJA}"
+								 type="{GetGalleryFromTableCommand}"/>
+		<spicefactory:MapCommand messageType="{AddGalleryImgMessage}" type="{AddGalleryImgCommand}"/>
+		<spicefactory:MapCommand messageType="{GalleryMessage}"
+								 selector="{GalleryMessage.REMOVE_IMG}"
+								 type="{RemoveGalleryImgCommand}"/>
+		
+		<spicefactory:MapCommand messageType="{HomeImgMessage}" selector="{HomeImgMessage.GET_IMGS}"
+								 type="{GetHomeImgCommand}"/>
+		<spicefactory:MapCommand messageType="{HomeImgMessage}" selector="{HomeImgMessage.ADD_IMG}"
+								 type="{AddHomeImgCommand}"/>
+		<spicefactory:MapCommand messageType="{HomeImgMessage}" selector="{HomeImgMessage.EDIT_IMG}"
+								 type="{EditHomeImgCommand}"/>
+		<spicefactory:MapCommand messageType="{HomeImgMessage}"
+								 selector="{HomeImgMessage.REMOVE_IMG}"
+								 type="{RemoveHomeImgCommand}"/>
+
+		<spicefactory:MapCommand messageType="{MenuMessage}" selector="{MenuMessage.GET_MENU}"
+								 type="{MenuCommand}"/>
+		<spicefactory:MapCommand messageType="{MenuMessage}" selector="{MenuMessage.ADD_MENU_ITEM}"
+								 type="{AddMenuItemCommand}"/>
+		
+		<spicefactory:MapCommand messageType="{MemberMessage}" selector="{MemberMessage.GET_MEMBERS}"
+								 type="{GetMemberCommand}"/>
+		<spicefactory:MapCommand messageType="{MemberMessage}" selector="{MemberMessage.ADD_MEMBER}"
+								 type="{AddMemberCommand}"/>
+		<spicefactory:MapCommand messageType="{MemberMessage}"
+								 selector="{MemberMessage.UPDATE_MEMBER}"
+								 type="{UpdateMemberCommand}"/>
+		<spicefactory:MapCommand messageType="{MemberMessage}"
+								 selector="{MemberMessage.REMOVE_MEMBER}"
+								 type="{RemoveMemberCommand}"/>
+		
+		<spicefactory:MapCommand messageType="{ContactMessage}" type="{ContactCommand}"/>
+		
+		<s:RemoteObject id="loginService" destination="amfphp" showBusyCursor="true"
+						source="CMSService"/>
+		
+		<spicefactory:Object type="{DataHolder2}"/>
+		
+	</fx:Declarations>
+	
+</fx:Object>

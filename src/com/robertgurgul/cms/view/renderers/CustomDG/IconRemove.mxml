@@ -1,0 +1,47 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:GridItemRenderer xmlns:fx="http://ns.adobe.com/mxml/2009"
+					xmlns:s="library://ns.adobe.com/flex/spark"
+					xmlns:mx="library://ns.adobe.com/flex/mx"
+					xmlns:parsley="http://www.spicefactory.org/parsley"
+					width="100%" height="100%" click="clickHandler(event)"
+					creationComplete="init();">
+	
+	<fx:Declarations>
+		
+	</fx:Declarations>
+	
+    <fx:Script>
+        <![CDATA[
+			
+			import mx.controls.Alert;
+			import mx.events.CloseEvent;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+            protected function init():void
+            {
+            }
+            
+            protected function clickHandler(event:MouseEvent):void
+            {
+				Alert.show("na pewno usunąć?", "Potwierdź",Alert.OK | Alert.CANCEL, null, function(eventObj:CloseEvent):void
+				{
+					if(eventObj.detail==Alert.OK) 
+					{
+						parentDocument.parent.parent.deleteProduct(data);
+					}
+				});
+            }
+			
+        ]]>
+    </fx:Script>
+    
+    <s:states>
+        <s:State name="active"/>
+    </s:states>
+    
+    <s:BitmapImage includeIn="active" horizontalCenter="0" source="@Embed('assets/btn_remove.png')"
+				   verticalCenter="0"/>
+   
+</s:GridItemRenderer>

@@ -1,0 +1,58 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:TitleWindow xmlns:fx="http://ns.adobe.com/mxml/2009"
+			   xmlns:s="library://ns.adobe.com/flex/spark"
+			   xmlns:mx="library://ns.adobe.com/flex/mx"
+			   xmlns:parsley="http://www.spicefactory.org/parsley"
+			   width="198" height="186" creationComplete="init(event)" horizontalCenter="0"
+			   title="Panel logowania" verticalCenter="0">
+	
+	<fx:Declarations>
+		<parsley:Configure/>
+	</fx:Declarations>
+	
+	<fx:Script>
+		<![CDATA[			
+			import com.robertgurgul.cms.classes.*;
+			import com.robertgurgul.cms.message.utils.LoginMessage;
+			import com.robertgurgul.cms.model.*;
+			import com.robertgurgul.cms.remoting.*;
+			import com.robertgurgul.cms.utils.PopUp;
+			
+			import mx.events.FlexEvent;
+			private var myService:MyService;
+			
+			[Inject]
+			public var popUp:PopUp;
+			
+			[MessageDispatcher]
+			public var dispatcher:Function;
+			
+			protected function init(event:FlexEvent):void
+			{
+				this.closeButton.visible = false;
+			}
+			
+			protected function Submit_clickHandler(event:MouseEvent = null):void
+			{
+				dispatcher( new LoginMessage(LoginMessage.LOGIN_CHECK, email.text, password.text) );
+			}
+			
+		]]>
+	</fx:Script>
+	
+		<mx:Label id="label1" x="10" y="10" text="Twoj email:"/>
+		<mx:TextInput id="email" x="10" y="29" width="176" text="ten"/>
+		<mx:Label id="label2" x="10" y="64" text="Hasło:"/>
+		<mx:TextInput id="password" x="10" y="83" width="176" displayAsPassword="true"
+					  keyDown="if (event.keyCode==Keyboard.ENTER){ Submit_clickHandler();}" text=""/>
+	
+		<s:controlBarContent>
+			<s:HGroup verticalAlign="baseline">
+				<mx:Button id="Submit" label="Wejdź" click="Submit_clickHandler(event)"
+						   cornerRadius="0"/>
+				<mx:Button id="SubmitChangePass" width="100" label="Zmiana hasła"
+						   click="popUp.showWindow(new ChangePass())"/>
+			</s:HGroup>
+		</s:controlBarContent>
+	
+</s:TitleWindow>

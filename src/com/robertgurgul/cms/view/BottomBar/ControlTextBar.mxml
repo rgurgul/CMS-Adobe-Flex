@@ -1,0 +1,89 @@
+<?xml version="1.0" encoding="utf-8"?>
+<s:Group xmlns:fx="http://ns.adobe.com/mxml/2009"
+		 xmlns:s="library://ns.adobe.com/flex/spark" 
+		 xmlns:mx="library://ns.adobe.com/flex/mx">
+	<fx:Declarations>
+		<!-- Place non-visual elements (e.g., services, value objects) here -->
+	</fx:Declarations>
+	<fx:Script>
+		<![CDATA[
+			import com.robertgurgul.cms.classes.*;
+			import flashx.textLayout.formats.TextAlign;
+			import mx.controls.Alert;
+			import spark.skins.SparkButtonSkin;
+			
+			public var control:Tlf_control;
+		]]>
+	</fx:Script>
+	<mx:ControlBar width="700" cornerRadius="0" paddingTop="0">
+		<mx:ToolBar width="700" horizontalGap="5" cornerRadius="0">
+			<s:DropDownList id="fontDDL"
+							width="150"
+							change="control.fontDDL_changeHandler(event);" cornerRadius="0">
+				<s:dataProvider>
+					<s:ArrayList source="[Serifa-Lig]" />
+				</s:dataProvider>
+			</s:DropDownList>
+			<s:DropDownList id="sizeDDL"
+							width="60"
+							change="control.sizeDDL_changeHandler(event);" cornerRadius="0">
+				<s:dataProvider>
+					<s:ArrayList source="[8,10,12,14,16,24,36,72]" />
+				</s:dataProvider>
+			</s:DropDownList>
+			<s:ToggleButton id="boldBtn"
+							label="B"
+							fontWeight="bold"
+							width="30"
+							click="control.boldBtn_clickHandler(event)" 
+							cornerRadius="0"/>
+			<s:ToggleButton id="italBtn"
+							label="I"
+							fontStyle="italic"
+							width="30"
+							click="control.italBtn_clickHandler(event);" 
+							cornerRadius="0"/>
+			<s:ToggleButton id="underBtn"
+							label="U" 
+							textDecoration="underline"
+							width="30"
+							click="control.underBtn_clickHandler(event);" 
+							cornerRadius="0"/>
+			<s:ToggleButton id="lineBtn"
+							label="S"
+							lineThrough="true"
+							width="30"
+							click="control.lineBtn_clickHandler(event);" 
+							cornerRadius="0"/>
+<!--			<s:ToggleButton id="super_script"
+							label="" icon="@Embed('assets/superscript_icon.png')"
+							fontWeight="bold"
+							width="30"
+							click="control.super_script_clickHandler(event)" 
+							cornerRadius="0"/>
+			<s:ToggleButton id="sub_script"
+							label="" icon="@Embed('assets/subscript_icon.png')"
+							fontWeight="bold"
+							width="30"
+							click="control.sub_script_clickHandler(event)" 
+							cornerRadius="0"/>-->
+			<mx:ColorPicker id="colorCP"
+							change="control.colorCP_changeHandler(event);" />
+			<s:ButtonBar id="txtAlignBB"
+						 arrowKeysWrapFocus="true"
+						 labelField="label"
+						 width="120"
+						 change="control.txtAlignBB_changeHandler(event);">
+				<s:dataProvider>
+					<s:ArrayList>
+						<fx:Object label="L" value="{TextAlign.LEFT}"/>
+						<fx:Object label="C" value="{TextAlign.CENTER}" />
+						<fx:Object label="R" value="{TextAlign.RIGHT}" />
+						<fx:Object label="J" value="{TextAlign.JUSTIFY}" />
+					</s:ArrayList>
+				</s:dataProvider>
+			</s:ButtonBar>
+			<s:Button x="511" y="0" width="62" label="Lista" cornerRadius="0" click="control.addList(event);" />
+		</mx:ToolBar>
+	</mx:ControlBar>
+</s:Group>
